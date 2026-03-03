@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { CreateKategoriDto } from './dto/create-kategori.dto';
 import { UpdateKategoriDto } from './dto/update-kategori.dto';
 import { PrismaService } from 'src/prisma.service';
@@ -16,7 +16,15 @@ export class KategoriService {
     // return `This action returns all kategori`;
     // buat variabel untuk menampilkan data kategori
     const data = await this.prisma.kategori.findMany();
-    return data;
+    return {
+      success: true,
+      message: '',
+      metadata: {
+        status: HttpStatus.OK,
+        total_data: data.length,
+      },
+      data: data,
+    };
   }
 
   findOne(id: number) {
