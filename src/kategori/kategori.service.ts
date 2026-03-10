@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateKategoriDto } from './dto/create-kategori.dto';
 import { UpdateKategoriDto } from './dto/update-kategori.dto';
 import { PrismaService } from 'src/prisma.service';
@@ -16,6 +16,23 @@ export class KategoriService {
     // return `This action returns all kategori`;
     // buat variabel untuk menampilkan data kategori
     const data = await this.prisma.kategori.findMany();
+
+    // jika data kategori tidak ditemukan, maka tampilkan pesan error
+    if (data.length === 0) {
+      throw new HttpException(
+        {
+          success: false,
+          message: 'Data kategori tidak ditemukan!',
+          metadata: {
+            status: HttpStatus.NOT_FOUND,
+            total_data: data.length,
+          },
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    // jika data kategori ditemukan, maka tampilkan data kategori
     return {
       success: true,
       message: '',
