@@ -7,8 +7,25 @@ import { PrismaService } from 'src/prisma.service';
 export class KategoriService {
   // buat konstruktor untuk menginisialisasi PrismaService
   constructor(private readonly prisma: PrismaService) {}
-  create(createKategoriDto: CreateKategoriDto) {
-    return 'This action adds a new kategori';
+
+  // buat fungsi tambah data
+  async create(createKategoriDto: CreateKategoriDto) {
+    // return 'This action adds a new kategori';
+    // simpan data kategori
+    await this.prisma.kategori.create({
+      data: {
+        nama: createKategoriDto.nama,
+      },
+    });
+
+    // tampikan respon
+    return {
+      success: true,
+      message: 'Data Kategori Berhasil Disimpan',
+      metadata: {
+        status: HttpStatus.CREATED,
+      },
+    };
   }
 
   // tampilkan seluruh data kategori
