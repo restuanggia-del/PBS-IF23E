@@ -162,7 +162,6 @@ export class KategoriService {
       metadata: {
         status: HttpStatus.OK,
       },
-      data: data,
     };
   }
 }
