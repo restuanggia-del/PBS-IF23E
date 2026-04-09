@@ -149,33 +149,46 @@ export class KategoriService {
   // buat fungsi untuk hapus data kategori
   async remove(id: number) {
     // return `This action removes a #${id} kategori`;
-    // tampilkan data kategori sesuai id
-    const data = await this.prisma.kategori.findUnique({
-      where: { id: id },
-    });
+    try {
+      // tampilkan data kategori sesuai id
+      const data = await this.prisma.kategori.findUnique({
+        where: { id: id },
+      });
 
-    // jika data ketegori tidak ditemukan
-    if (!data) {
-      throw new NotFoundException({
-        success: false,
-        message: 'Data kategori tidak ditemukan!',
+      // jika data ketegori tidak ditemukan
+      if (!data) {
+        throw new NotFoundException({
+          success: false,
+          message: 'Data kategori tidak ditemukan!',
+          metadata: {
+            status: HttpStatus.NOT_FOUND,
+          },
+        });
+      }
+
+      // jika data kategori ditemukan
+      // hapus data kategori berdasarkan id
+      await this.prisma.kategori.delete({
+        where: { id: id },
+      });
+      return {
+        success: true,
+        message: 'Data kategori berhasil dihapus!',
         metadata: {
-          status: HttpStatus.NOT_FOUND,
+          status: HttpStatus.OK,
+        },
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new BadRequestException({
+        success: false,
+        message: 'Parameter / Slug UD Harus Angka!',
+        metadata: {
+          status: HttpStatus.BAD_REQUEST,
         },
       });
     }
-
-    // jika data kategori ditemukan
-    // hapus data kategori berdasarkan id
-    await this.prisma.kategori.delete({
-      where: { id: id },
-    });
-    return {
-      success: true,
-      message: 'Data kategori berhasil dihapus!',
-      metadata: {
-        status: HttpStatus.OK,
-      },
-    };
   }
 }
