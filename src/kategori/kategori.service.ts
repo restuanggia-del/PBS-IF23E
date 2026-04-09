@@ -6,7 +6,7 @@ import { PrismaService } from '../prisma.service';
 @Injectable()
 export class KategoriService {
   // buat konstruktor untuk menginisialisasi PrismaService
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   //buat fungsi untuk tambah data
   async create(createKategoriDto: CreateKategoriDto) {
@@ -142,8 +142,58 @@ export class KategoriService {
   }
 
   // buat fungsi untuk update data kategori
-  update(id: number, updateKategoriDto: UpdateKategoriDto) {
-    return `This action updates a #${id} kategori`;
+  async update(id: number, updateKategoriDto: UpdateKategoriDto) {
+    // return `This action updates a #${id} kategori`;
+    try {
+      // tampilkan data kategori sesuai id
+      const data = await this.prisma.kategori.findUnique({
+        where: { id: id },
+      });
+
+      // jika data ketegori tidak ditemukan
+      if (!data) {
+        throw new NotFoundException({
+          success: false,
+          message: 'Data kategori tidak ditemukan!',
+          metadata: {
+            status: HttpStatus.NOT_FOUND,
+          },
+        });
+      }
+
+      // jika data kategori ditemukan
+      // buat variabel untuk filter nama
+      const nama_filter = (updateKategoriDto.nama ?? '')
+        .trim() //spasi di awal dan akhir kata akan dihapus
+        .replace(/\s/g, '') //spasi di tengah kata akan dihapus
+        .toLowerCase();
+      // update data kategori berdasarkan id
+      await this.prisma.kategori.update({
+        where: { id: id },
+        data: {
+          nama: updateKategoriDto.nama,
+          nama_filter: nama_filter,
+        },
+      });
+      return {
+        success: true,
+        message: 'Data kategori berhasil diupdate!',
+        metadata: {
+          status: HttpStatus.OK,
+        },
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new BadRequestException({
+        success: false,
+        message: 'Parameter / Slug UD Harus Angka!',
+        metadata: {
+          status: HttpStatus.BAD_REQUEST,
+        },
+      });
+    }
   }
 
   // buat fungsi untuk hapus data kategori
