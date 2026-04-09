@@ -5,27 +5,20 @@ import { PrismaService } from '../prisma.service';
 
 @Injectable()
 export class KategoriService {
-  // buat konstruktor untuk menginisialisasi PrismaService
   constructor(private readonly prisma: PrismaService) {}
 
-  //buat fungsi untuk tambah data
   async create(createKategoriDto: CreateKategoriDto) {
-    //return 'This action adds a new kategori';
-
-    //buat variabel untuk filter nama kategori, agar tidak terjadi duplikasi data kategori
     const nama_filter = createKategoriDto.nama
-      .trim() //spasi di awal dan akhir kata akan dihapus
-      .replace(/\s/g, '') //spasi di tengah kata akan dihapus
-      .toLowerCase(); //merubah huruf kecil semua
+      .trim()
+      .replace(/\s/g, '')
+      .toLowerCase();
 
-    //cek apakah data kategori sudah ada
     const exist = await this.prisma.kategori.findFirst({
       where: {
         nama_filter: nama_filter,
       },
     });
 
-    //jika data kategori sudah ada
     if (exist) {
       throw new ConflictException({
         success: false,
@@ -36,9 +29,6 @@ export class KategoriService {
       });
     }
 
-    //jika data kategori belum ada
-
-    // simpan data kategori
     await this.prisma.kategori.create({
       data: {
         nama: createKategoriDto.nama,
@@ -46,7 +36,6 @@ export class KategoriService {
       },
     });
 
-    // menampilkan respon
     return {
       success: true,
       message: 'Data kategori berhasil ditambahkan!',
@@ -56,26 +45,10 @@ export class KategoriService {
     };
   }
 
-  // tampilkan seluruh data kategori
   async findAll() {
-    // return `This action returns all kategori`;
-    // buat variabel untuk menampilkan data kategori
     const data = await this.prisma.kategori.findMany();
 
-    // jika data kategori tidak ditemukan, maka tampilkan pesan error
     if (data.length === 0) {
-      // throw new HttpException(
-      //   {
-      //     success: false,
-      //     message: 'Data kategori tidak ditemukan!',
-      //     metadata: {
-      //       status: HttpStatus.NOT_FOUND,
-      //       total_data: data.length,
-      //     },
-      //   },
-      //   HttpStatus.NOT_FOUND,
-      // );
-
       throw new NotFoundException({
         success: false,
         message: 'Data kategori tidak ditemukan!',
@@ -86,7 +59,6 @@ export class KategoriService {
       });
     }
 
-    // jika data kategori ditemukan, maka tampilkan data kategori
     return {
       success: true,
       message: '',
@@ -98,16 +70,12 @@ export class KategoriService {
     };
   }
 
-  //buat fungsi untuk detail data
   async findOne(id: number) {
-    //return `This action returns a #${id} kategori`;
     try {
-      // tampilkan data kategori sesuai id
       const data = await this.prisma.kategori.findUnique({
         where: { id: id },
       });
 
-      // jika data kategori tidak ditemukan, maka tampilkan pesan error
       if (!data) {
         throw new NotFoundException({
           success: false,
@@ -118,7 +86,6 @@ export class KategoriService {
         });
       }
 
-      // jika data kategori ditemukan, maka tampilkan data kategori
       return {
         success: true,
         message: '',
@@ -141,16 +108,12 @@ export class KategoriService {
     }
   }
 
-  // buat fungsi untuk update data kategori
   async update(id: number, updateKategoriDto: UpdateKategoriDto) {
-    // return `This action updates a #${id} kategori`;
     try {
-      // tampilkan data kategori sesuai id
       const data = await this.prisma.kategori.findUnique({
         where: { id: id },
       });
 
-      // jika data ketegori tidak ditemukan
       if (!data) {
         throw new NotFoundException({
           success: false,
@@ -161,13 +124,11 @@ export class KategoriService {
         });
       }
 
-      // jika data kategori ditemukan
-      // buat variabel untuk filter nama
       const nama_filter = (updateKategoriDto.nama ?? '')
-        .trim() //spasi di awal dan akhir kata akan dihapus
-        .replace(/\s/g, '') //spasi di tengah kata akan dihapus
+        .trim()
+        .replace(/\s/g, '')
         .toLowerCase();
-      // update data kategori berdasarkan id
+
       await this.prisma.kategori.update({
         where: { id: id },
         data: {
@@ -196,16 +157,12 @@ export class KategoriService {
     }
   }
 
-  // buat fungsi untuk hapus data kategori
   async remove(id: number) {
-    // return `This action removes a #${id} kategori`;
     try {
-      // tampilkan data kategori sesuai id
       const data = await this.prisma.kategori.findUnique({
         where: { id: id },
       });
 
-      // jika data ketegori tidak ditemukan
       if (!data) {
         throw new NotFoundException({
           success: false,
@@ -216,8 +173,6 @@ export class KategoriService {
         });
       }
 
-      // jika data kategori ditemukan
-      // hapus data kategori berdasarkan id
       await this.prisma.kategori.delete({
         where: { id: id },
       });
