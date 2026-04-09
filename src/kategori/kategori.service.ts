@@ -1,4 +1,4 @@
-import { ConflictException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateKategoriDto } from './dto/create-kategori.dto';
 import { UpdateKategoriDto } from './dto/update-kategori.dto';
 import { PrismaService } from '../prisma.service';
@@ -6,7 +6,7 @@ import { PrismaService } from '../prisma.service';
 @Injectable()
 export class KategoriService {
   // buat konstruktor untuk menginisialisasi PrismaService
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   //buat fungsi untuk tambah data
   async create(createKategoriDto: CreateKategoriDto) {
@@ -38,7 +38,7 @@ export class KategoriService {
 
     //jika data kategori belum ada
 
-    //simpan data kategori
+    // simpan data kategori
     await this.prisma.kategori.create({
       data: {
         nama: createKategoriDto.nama,
@@ -46,7 +46,7 @@ export class KategoriService {
       },
     });
 
-    //tampilkan respon
+    // menampilkan respon
     return {
       success: true,
       message: 'Data kategori berhasil ditambahkan!',
@@ -101,33 +101,47 @@ export class KategoriService {
   //buat fungsi untuk detail data
   async findOne(id: number) {
     //return `This action returns a #${id} kategori`;
+    try {
+      // tampilkan data kategori sesuai id
+      const data = await this.prisma.kategori.findUnique({
+        where: { id: id },
+      });
 
-    // tampilkan data kategori sesuai id
-    const data = await this.prisma.kategori.findUnique({
-      where: { id: id },
-    });
+      // jika data kategori tidak ditemukan, maka tampilkan pesan error
+      if (!data) {
+        throw new NotFoundException({
+          success: false,
+          message: 'Data kategori tidak ditemukan!',
+          metadata: {
+            status: HttpStatus.NOT_FOUND,
+          },
+        });
+      }
 
-    // jika data ketegori tidak ditemukan
-    if (!data) {
-      throw new NotFoundException({
-        success: false,
-        message: 'Data kategori tidak ditemukan!',
+      // jika data kategori ditemukan, maka tampilkan data kategori
+      return {
+        success: true,
+        message: '',
         metadata: {
-          status: HttpStatus.NOT_FOUND,
+          status: HttpStatus.OK,
+        },
+        data: data,
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new BadRequestException({
+        success: false,
+        message: 'Parameter / Slug UD Harus Angka!',
+        metadata: {
+          status: HttpStatus.BAD_REQUEST,
         },
       });
     }
-    // jika data kategori ditemukan
-    return {
-      success: true,
-      message: '',
-      metadata: {
-        status: HttpStatus.OK,
-      },
-      data: data,
-    };
   }
 
+  // buat fungsi untuk update data kategori
   update(id: number, updateKategoriDto: UpdateKategoriDto) {
     return `This action updates a #${id} kategori`;
   }
@@ -135,7 +149,6 @@ export class KategoriService {
   // buat fungsi untuk hapus data kategori
   async remove(id: number) {
     // return `This action removes a #${id} kategori`;
-
     // tampilkan data kategori sesuai id
     const data = await this.prisma.kategori.findUnique({
       where: { id: id },
@@ -151,6 +164,7 @@ export class KategoriService {
         },
       });
     }
+
     // jika data kategori ditemukan
     // hapus data kategori berdasarkan id
     await this.prisma.kategori.delete({
