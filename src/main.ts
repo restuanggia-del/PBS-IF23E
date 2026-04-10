@@ -5,7 +5,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   // Set global prefix for all routes
   app.setGlobalPrefix('api');
-  await app.listen(process.env.PORT ?? 3001);
+  await app.listen(process.env.PORT!);
 }
 
 void bootstrap();
