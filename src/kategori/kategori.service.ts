@@ -22,7 +22,7 @@ export class KategoriService {
     if (exist) {
       throw new ConflictException({
         success: false,
-        massage: 'Data kategori sudah ada!',
+        massage: process.env.FAILED_SAVE,
         metadata: {
           status: HttpStatus.CONFLICT,
         },
@@ -38,7 +38,7 @@ export class KategoriService {
 
     return {
       success: true,
-      message: 'Data kategori berhasil ditambahkan!',
+      message: process.env.SUCCESS_SAVE,
       metadata: {
         status: HttpStatus.CREATED,
       },
@@ -51,7 +51,7 @@ export class KategoriService {
     if (data.length === 0) {
       throw new NotFoundException({
         success: false,
-        message: 'Data kategori tidak ditemukan!',
+        message: process.env.FAILED_SAVE,
         metadata: {
           status: HttpStatus.NOT_FOUND,
           total_data: data.length,
@@ -79,7 +79,7 @@ export class KategoriService {
       if (!data) {
         throw new NotFoundException({
           success: false,
-          message: 'Data kategori tidak ditemukan!',
+          message: process.env.FAILED_SAVE,
           metadata: {
             status: HttpStatus.NOT_FOUND,
           },
@@ -100,7 +100,7 @@ export class KategoriService {
       }
       throw new BadRequestException({
         success: false,
-        message: 'Parameter / Slug UD Harus Angka!',
+        message: process.env.INVALID_ID,
         metadata: {
           status: HttpStatus.BAD_REQUEST,
         },
@@ -117,7 +117,7 @@ export class KategoriService {
       if (!data) {
         throw new NotFoundException({
           success: false,
-          message: 'Data kategori tidak ditemukan!',
+          message: process.env.FAILED_UPDATE,
           metadata: {
             status: HttpStatus.NOT_FOUND,
           },
@@ -139,7 +139,7 @@ export class KategoriService {
       if (exist) {
         throw new ConflictException({
           success: false,
-          massage: 'Data kategori sudah ada!',
+          massage: process.env.FAILED_UPDATE,
           metadata: {
             status: HttpStatus.CONFLICT,
           },
@@ -155,7 +155,7 @@ export class KategoriService {
       });
       return {
         success: true,
-        message: 'Data kategori berhasil diupdate!',
+        message: process.env.SUCCESS_UPDATE,
         metadata: {
           status: HttpStatus.OK,
         },
@@ -166,7 +166,7 @@ export class KategoriService {
       }
       throw new BadRequestException({
         success: false,
-        message: 'Parameter / Slug UD Harus Angka!',
+        message: process.env.INVALID_ID,
         metadata: {
           status: HttpStatus.BAD_REQUEST,
         },
@@ -183,7 +183,7 @@ export class KategoriService {
       if (!data) {
         throw new NotFoundException({
           success: false,
-          message: 'Data kategori tidak ditemukan!',
+          message: process.env.FAILED_DELETE,
           metadata: {
             status: HttpStatus.NOT_FOUND,
           },
@@ -195,7 +195,7 @@ export class KategoriService {
       });
       return {
         success: true,
-        message: 'Data kategori berhasil dihapus!',
+        message: process.env.SUCCESS_DELETE,
         metadata: {
           status: HttpStatus.OK,
         },
@@ -206,7 +206,7 @@ export class KategoriService {
       }
       throw new BadRequestException({
         success: false,
-        message: 'Parameter / Slug UD Harus Angka!',
+        message: process.env.INVALID_ID,
         metadata: {
           status: HttpStatus.BAD_REQUEST,
         },
