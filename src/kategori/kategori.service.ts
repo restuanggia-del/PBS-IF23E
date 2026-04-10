@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateKategoriDto } from './dto/create-kategori.dto';
 import { UpdateKategoriDto } from './dto/update-kategori.dto';
 import { PrismaService } from '../prisma.service';
@@ -129,6 +129,23 @@ export class KategoriService {
         .replace(/\s/g, '')
         .toLowerCase();
 
+      const exist = await this.prisma.kategori.findFirst({
+        where: {
+          NOT: { id: id },
+          nama_filter: nama_filter,
+        },
+      });
+
+      if (exist) {
+        throw new ConflictException({
+          success: false,
+          massage: 'Data kategori sudah ada!',
+          metadata: {
+            status: HttpStatus.CONFLICT,
+          },
+        });
+      }
+
       await this.prisma.kategori.update({
         where: { id: id },
         data: {
@@ -144,7 +161,7 @@ export class KategoriService {
         },
       };
     } catch (error) {
-      if (error instanceof NotFoundException) {
+      if (error instanceof HttpException) {
         throw error;
       }
       throw new BadRequestException({
