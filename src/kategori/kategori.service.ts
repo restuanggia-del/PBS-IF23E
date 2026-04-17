@@ -1,7 +1,15 @@
-import { BadRequestException, ConflictException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateKategoriDto } from './dto/create-kategori.dto';
 import { UpdateKategoriDto } from './dto/update-kategori.dto';
 import { PrismaService } from '../prisma.service';
+import { NotExistKategori } from 'src/common/utils/not.exist.kategori.util';
 
 @Injectable()
 export class KategoriService {
@@ -72,19 +80,8 @@ export class KategoriService {
 
   async findOne(id: number) {
     try {
-      const data = await this.prisma.kategori.findUnique({
-        where: { id: id },
-      });
-
-      if (!data) {
-        throw new NotFoundException({
-          success: false,
-          message: process.env.FAILED_SAVE,
-          metadata: {
-            status: HttpStatus.NOT_FOUND,
-          },
-        });
-      }
+      // panggil fungsi not exist kategori
+      const data = await NotExistKategori(id, this.prisma);
 
       return {
         success: true,
@@ -110,19 +107,7 @@ export class KategoriService {
 
   async update(id: number, updateKategoriDto: UpdateKategoriDto) {
     try {
-      const data = await this.prisma.kategori.findUnique({
-        where: { id: id },
-      });
-
-      if (!data) {
-        throw new NotFoundException({
-          success: false,
-          message: process.env.FAILED_UPDATE,
-          metadata: {
-            status: HttpStatus.NOT_FOUND,
-          },
-        });
-      }
+      await NotExistKategori(id, this.prisma);
 
       const nama_filter = (updateKategoriDto.nama ?? '')
         .trim()
@@ -176,19 +161,7 @@ export class KategoriService {
 
   async remove(id: number) {
     try {
-      const data = await this.prisma.kategori.findUnique({
-        where: { id: id },
-      });
-
-      if (!data) {
-        throw new NotFoundException({
-          success: false,
-          message: process.env.FAILED_DELETE,
-          metadata: {
-            status: HttpStatus.NOT_FOUND,
-          },
-        });
-      }
+      await NotExistKategori(id, this.prisma);
 
       await this.prisma.kategori.delete({
         where: { id: id },
