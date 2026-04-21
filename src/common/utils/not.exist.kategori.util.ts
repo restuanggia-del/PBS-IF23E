@@ -15,6 +15,5 @@ export const NotExistKategori = async (id: number, prisma: PrismaService) => {
       },
     });
   }
-
   return data;
 };

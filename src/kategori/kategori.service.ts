@@ -10,32 +10,19 @@ import { CreateKategoriDto } from './dto/create-kategori.dto';
 import { UpdateKategoriDto } from './dto/update-kategori.dto';
 import { PrismaService } from '../prisma.service';
 import { NotExistKategori } from 'src/common/utils/not.exist.kategori.util';
+import { conflictKategori } from 'src/common/utils/conflict-kategori.utils';
 
 @Injectable()
 export class KategoriService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createKategoriDto: CreateKategoriDto) {
-    const nama_filter = createKategoriDto.nama
-      .trim()
-      .replace(/\s/g, '')
-      .toLowerCase();
-
-    const exist = await this.prisma.kategori.findFirst({
-      where: {
-        nama_filter: nama_filter,
-      },
-    });
-
-    if (exist) {
-      throw new ConflictException({
-        success: false,
-        massage: process.env.FAILED_SAVE,
-        metadata: {
-          status: HttpStatus.CONFLICT,
-        },
-      });
-    }
+    const nama_filter = await conflictKategori(
+      createKategoriDto.nama,
+      0,
+      process.env.FAILED_SAVE!,
+      this.prisma,
+    );
 
     await this.prisma.kategori.create({
       data: {
@@ -80,7 +67,6 @@ export class KategoriService {
 
   async findOne(id: number) {
     try {
-      // panggil fungsi not exist kategori
       const data = await NotExistKategori(id, this.prisma);
 
       return {
