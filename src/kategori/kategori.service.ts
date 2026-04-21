@@ -18,7 +18,6 @@ export class KategoriService {
   async create(createKategoriDto: CreateKategoriDto) {
     const nama_filter = await conflictKategori(
       createKategoriDto.nama,
-      0,
       process.env.FAILED_SAVE!,
       this.prisma,
     );
@@ -96,9 +95,9 @@ export class KategoriService {
 
       const nama_filter = await conflictKategori(
         updateKategoriDto.nama ?? '',
-        id,
         process.env.FAILED_UPDATE!,
         this.prisma,
+        id,
       );
 
       await this.prisma.kategori.update({

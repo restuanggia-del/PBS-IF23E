@@ -3,16 +3,16 @@ import { PrismaService } from '../../prisma.service';
 
 export const conflictKategori = async (
   nama: string,
-  id: number,
   massage: string,
   prisma: PrismaService,
+  id?: number,
 ) => {
   const nama_filter = nama.trim().replace(/\s/g, '').toLowerCase();
 
   const exist = await prisma.kategori.findFirst({
     where: {
-      NOT: { id: id },
       nama_filter: nama_filter,
+      ...(id ? { NOT: { id: id } } : {}),
     },
   });
 
