@@ -1,6 +1,5 @@
 import {
   BadRequestException,
-  ConflictException,
   HttpException,
   HttpStatus,
   Injectable,
@@ -95,27 +94,12 @@ export class KategoriService {
     try {
       await NotExistKategori(id, this.prisma);
 
-      const nama_filter = (updateKategoriDto.nama ?? '')
-        .trim()
-        .replace(/\s/g, '')
-        .toLowerCase();
-
-      const exist = await this.prisma.kategori.findFirst({
-        where: {
-          NOT: { id: id },
-          nama_filter: nama_filter,
-        },
-      });
-
-      if (exist) {
-        throw new ConflictException({
-          success: false,
-          massage: process.env.FAILED_UPDATE,
-          metadata: {
-            status: HttpStatus.CONFLICT,
-          },
-        });
-      }
+      const nama_filter = await conflictKategori(
+        updateKategoriDto.nama ?? '',
+        id,
+        process.env.FAILED_UPDATE!,
+        this.prisma,
+      );
 
       await this.prisma.kategori.update({
         where: { id: id },
